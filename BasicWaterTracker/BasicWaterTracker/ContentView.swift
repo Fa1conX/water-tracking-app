@@ -37,39 +37,38 @@ struct ContentView: View {
                 ScrollView {
                     VStack(spacing: 30) {
                         // Circular progress with +/- buttons
-                        ZStack {
+                        HStack(alignment: .circleCenter, spacing: 30) {
+                            // Minus button
+                            Button(action: {
+                                if viewModel.getTdayTotal() > 0 {
+                                    viewModel.removeLastEntry()
+                                }
+                            }) {
+                                Image(systemName: "minus")
+                                    .font(.system(size: 28, weight: .semibold))
+                                    .foregroundColor(.blue)
+                            }
+                            .alignmentGuide(.circleCenter) { d in d[VerticalAlignment.center] }
+                            
+                            // Circular progress indicator
                             CircularWaterProgress(
                                 currentAmount: viewModel.getTdayTotal(),
                                 dailyGoal: viewModel.dailyGoal
                             )
                             .frame(maxWidth: 200)
+                            .alignmentGuide(.circleCenter) { d in d[VerticalAlignment.center] + 50 }
                             
-                            HStack(spacing: 30) {
-                                // Minus button
-                                Button(action: {
-                                    if viewModel.getTdayTotal() > 0 {
-                                        viewModel.removeLastEntry()
-                                    }
-                                }) {
-                                    Image(systemName: "minus")
-                                        .font(.system(size: 28, weight: .semibold))
-                                        .foregroundColor(.blue)
+                            // Plus button
+                            Button(action: {
+                                if !viewModel.presets.isEmpty {
+                                    viewModel.addWaterEntry(amount: viewModel.presets[0])
                                 }
-                                
-                                Spacer()
-                                
-                                // Plus button
-                                Button(action: {
-                                    if !viewModel.presets.isEmpty {
-                                        viewModel.addWaterEntry(amount: viewModel.presets[0])
-                                    }
-                                }) {
-                                    Image(systemName: "plus")
-                                        .font(.system(size: 28, weight: .semibold))
-                                        .foregroundColor(.blue)
-                                }
+                            }) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 28, weight: .semibold))
+                                    .foregroundColor(.blue)
                             }
-                            .frame(maxWidth: 160)
+                            .alignmentGuide(.circleCenter) { d in d[VerticalAlignment.center] }
                         }
                         .padding()
                         
@@ -158,6 +157,16 @@ struct ScaleButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
+}
+
+extension VerticalAlignment {
+    private struct CircleCenter: AlignmentID {
+        static func defaultValue(in context: ViewDimensions) -> CGFloat {
+            context[VerticalAlignment.center]
+        }
+    }
+    
+    static let circleCenter = VerticalAlignment(CircleCenter.self)
 }
 
 #Preview {
