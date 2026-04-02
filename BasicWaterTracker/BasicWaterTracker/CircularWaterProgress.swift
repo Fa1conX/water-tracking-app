@@ -48,17 +48,15 @@ struct CircularWaterProgress: View {
                     .animation(.easeInOut(duration: 0.5), value: progress)
                 
                 // Center text - amount centered, oz below
-                VStack(alignment: .center, spacing: 4) {
-                    Spacer()
-                    Text("\(String(format: "%.1f", currentAmount))")
-                        .font(.system(size: 48, weight: .bold))
-                        .foregroundColor(.blue)
-                    Text("oz")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.gray)
-                    Spacer()
-                }
-                .frame(maxHeight: .infinity)
+                Text("\(String(format: "%.1f", currentAmount))")
+                    .font(.system(size: 48, weight: .bold))
+                    .foregroundColor(.blue)
+                
+                // oz label offset below
+                Text("oz")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.gray)
+                    .offset(y: 32)
             }
             .aspectRatio(1, contentMode: .fit)
             .frame(maxWidth: 200)
