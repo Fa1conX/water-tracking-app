@@ -133,8 +133,12 @@ struct ContentView: View {
                         
                         Spacer(minLength: 20)
                     }
+                    .frame(maxWidth: .infinity)
+                    .background(Color(red: 0.94, green: 0.94, blue: 0.96))
                 }
+                .background(Color(red: 0.94, green: 0.94, blue: 0.96))
             }
+            .background(Color(red: 0.94, green: 0.94, blue: 0.96))
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()
