@@ -37,9 +37,9 @@ struct CircularWaterProgress: View {
                 Circle()
                     .stroke(Color(.systemGray6), lineWidth: 12)
                 
-                // Progress circle (filled from bottom)
+                // Progress circle (filled from bottom all the way around)
                 Circle()
-                    .trim(from: 0.75, to: 0.75 + (progress * 0.5))
+                    .trim(from: 0.75, to: 0.75 + progress)
                     .stroke(
                         Color(red: 0.3, green: 0.7, blue: 1.0),
                         style: StrokeStyle(lineWidth: 12, lineCap: .round)
