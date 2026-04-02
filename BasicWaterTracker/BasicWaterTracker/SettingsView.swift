@@ -36,11 +36,6 @@ struct SettingsView: View {
                 }
                 
                 Section {
-                    Button(action: savePresets) {
-                        Text("Save Presets")
-                            .foregroundColor(.blue)
-                    }
-                    
                     Button(action: resetPresets) {
                         Text("Reset to Default")
                             .foregroundColor(.orange)
@@ -52,6 +47,7 @@ struct SettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
+                        savePresets()
                         dismiss()
                     }
                 }
@@ -95,8 +91,6 @@ struct SettingsView: View {
         
         viewModel.updatePresets([p1, p2, p3])
         viewModel.updateDailyGoal(goal)
-        alertMessage = "Settings saved successfully!"
-        showAlert = true
     }
     
     private func resetPresets() {
