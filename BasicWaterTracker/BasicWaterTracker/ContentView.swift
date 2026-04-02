@@ -48,7 +48,6 @@ struct ContentView: View {
                                     .font(.system(size: 28, weight: .semibold))
                                     .foregroundColor(.blue)
                             }
-                            .frame(maxHeight: .infinity, alignment: .center)
                             
                             // Circular progress indicator
                             CircularWaterProgress(
@@ -67,9 +66,7 @@ struct ContentView: View {
                                     .font(.system(size: 28, weight: .semibold))
                                     .foregroundColor(.blue)
                             }
-                            .frame(maxHeight: .infinity, alignment: .center)
                         }
-                        .frame(height: 200)
                         .padding()
                         
                         // Quick add buttons (3 in a row)
