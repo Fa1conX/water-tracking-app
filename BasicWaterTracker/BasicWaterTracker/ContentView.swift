@@ -37,7 +37,7 @@ struct ContentView: View {
                 ScrollView {
                     VStack(spacing: 30) {
                         // Circular progress with +/- buttons
-                        HStack(spacing: 30, alignment: .center) {
+                        HStack(alignment: .center, spacing: 30) {
                             // Minus button
                             Button(action: {
                                 if viewModel.getTdayTotal() > 0 {
