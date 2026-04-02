@@ -37,4 +37,13 @@ class StorageService {
         let defaults = UserDefaults.standard.array(forKey: "waterPresets") as? [Double]
         return defaults ?? [8, 16, 24]  // Default presets in oz
     }
+    
+    func saveDailyGoal(_ goal: Double) {
+        UserDefaults.standard.set(goal, forKey: "waterDailyGoal")
+    }
+    
+    func loadDailyGoal() -> Double {
+        let saved = UserDefaults.standard.double(forKey: "waterDailyGoal")
+        return saved > 0 ? saved : 64  // Default daily goal in oz
+    }
 }

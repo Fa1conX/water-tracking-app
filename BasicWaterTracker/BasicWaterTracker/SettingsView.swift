@@ -14,12 +14,18 @@ struct SettingsView: View {
     @State private var preset1: String = ""
     @State private var preset2: String = ""
     @State private var preset3: String = ""
+    @State private var dailyGoalInput: String = ""
     @State private var showAlert = false
     @State private var alertMessage = ""
     
     var body: some View {
         NavigationView {
             Form {
+                Section(header: Text("Daily Goal (oz)")) {
+                    TextField("Daily Goal", text: $dailyGoalInput)
+                        .keyboardType(.decimalPad)
+                }
+                
                 Section(header: Text("Quick Add Presets (oz)")) {
                     TextField("Preset 1", text: $preset1)
                         .keyboardType(.decimalPad)
@@ -52,6 +58,7 @@ struct SettingsView: View {
             }
             .onAppear {
                 loadCurrentPresets()
+                loadCurrentDailyGoal()
             }
             .alert("Error", isPresented: $showAlert) {
                 Button("OK") { }
@@ -67,6 +74,10 @@ struct SettingsView: View {
         preset3 = String(viewModel.presets[2])
     }
     
+    private func loadCurrentDailyGoal() {
+        dailyGoalInput = String(Int(viewModel.dailyGoal))
+    }
+    
     private func savePresets() {
         guard let p1 = Double(preset1), p1 > 0,
               let p2 = Double(preset2), p2 > 0,
@@ -76,15 +87,24 @@ struct SettingsView: View {
             return
         }
         
+        guard let goal = Double(dailyGoalInput), goal > 0 else {
+            alertMessage = "Please enter a valid positive number for daily goal"
+            showAlert = true
+            return
+        }
+        
         viewModel.updatePresets([p1, p2, p3])
-        alertMessage = "Presets saved successfully!"
+        viewModel.updateDailyGoal(goal)
+        alertMessage = "Settings saved successfully!"
         showAlert = true
     }
     
     private func resetPresets() {
         viewModel.updatePresets([8, 16, 24])
+        viewModel.updateDailyGoal(64)
         loadCurrentPresets()
-        alertMessage = "Presets reset to default!"
+        loadCurrentDailyGoal()
+        alertMessage = "Settings reset to default!"
         showAlert = true
     }
 }

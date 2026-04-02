@@ -19,6 +19,7 @@ class WaterTrackingViewModel: ObservableObject {
     init() {
         loadEntries()
         loadPresets()
+        loadDailyGoal()
     }
     
     // MARK: - Public Methods
@@ -73,5 +74,14 @@ class WaterTrackingViewModel: ObservableObject {
     func updatePresets(_ newPresets: [Double]) {
         presets = newPresets
         storageService.savePresets(newPresets)
+    }
+    
+    func updateDailyGoal(_ newGoal: Double) {
+        dailyGoal = newGoal
+        storageService.saveDailyGoal(newGoal)
+    }
+    
+    private func loadDailyGoal() {
+        dailyGoal = storageService.loadDailyGoal()
     }
 }

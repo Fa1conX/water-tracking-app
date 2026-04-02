@@ -69,27 +69,29 @@ struct ContentView: View {
                         }
                         .padding()
                         
-                        // Quick add buttons
-                        VStack(spacing: 12) {
+                        // Quick add buttons (3 in a row)
+                        HStack(spacing: 12) {
                             ForEach(viewModel.presets, id: \.self) { preset in
                                 Button(action: {
                                     viewModel.addWaterEntry(amount: preset)
                                 }) {
-                                    HStack {
+                                    VStack(spacing: 4) {
                                         Image(systemName: "drop.fill")
-                                            .font(.system(size: 16))
+                                            .font(.system(size: 14))
                                         
-                                        Text("\(String(format: "%.0f", preset)) oz")
-                                            .font(.system(size: 16, weight: .semibold))
+                                        Text("\(String(format: "%.0f", preset))")
+                                            .font(.system(size: 12, weight: .semibold))
                                         
-                                        Spacer()
+                                        Text("oz")
+                                            .font(.system(size: 10))
                                     }
                                     .frame(maxWidth: .infinity)
-                                    .padding()
+                                    .padding(.vertical, 12)
                                     .background(Color.blue)
                                     .foregroundColor(.white)
-                                    .cornerRadius(10)
+                                    .cornerRadius(8)
                                 }
+                                .buttonStyle(ScaleButtonStyle())
                             }
                         }
                         .padding(.horizontal)
@@ -143,6 +145,14 @@ struct ContentView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView()
         }
+    }
+}
+
+struct ScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
 }
 
