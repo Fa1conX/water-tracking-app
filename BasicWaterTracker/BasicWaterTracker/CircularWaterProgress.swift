@@ -56,6 +56,7 @@ struct CircularWaterProgress: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.gray)
                 }
+                .offset(y: -8)
             }
             .aspectRatio(1, contentMode: .fit)
             .frame(maxWidth: 200)
