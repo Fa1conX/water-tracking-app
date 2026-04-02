@@ -33,7 +33,9 @@ struct ContentView: View {
                             .frame(width: 44, height: 44)
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.vertical, 16)
+                .padding(.top, 8)
                 
                 ScrollView {
                     VStack(spacing: 30) {

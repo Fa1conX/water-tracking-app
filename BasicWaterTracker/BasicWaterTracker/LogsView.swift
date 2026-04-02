@@ -23,40 +23,46 @@ struct LogsView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with date navigation
-            HStack {
-                Button(action: { selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.blue)
-                        .frame(width: 44, height: 44)
-                }
-                
-                VStack(spacing: 4) {
-                    Text(selectedDate.formatted(date: .abbreviated, time: .omitted))
-                        .font(.system(size: 18, weight: .semibold))
-                    Text("\(String(format: "%.1f", selectedDateTotal)) oz")
-                        .font(.system(size: 14))
-                        .foregroundColor(.blue)
-                }
-                
-                Spacer()
-                
-                Button(action: {
-                    let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
-                    if tomorrow <= Date() {
-                        selectedDate = tomorrow
+        ZStack {
+            // Background
+            Color(red: 0.1608, green: 0.1647, blue: 0.1686)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Header with date navigation
+                HStack {
+                    Button(action: { selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate }) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.blue)
+                            .frame(width: 44, height: 44)
                     }
-                }) {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.blue)
-                        .frame(width: 44, height: 44)
+                    
+                    VStack(spacing: 4) {
+                        Text(selectedDate.formatted(date: .abbreviated, time: .omitted))
+                            .font(.system(size: 18, weight: .semibold))
+                        Text("\(String(format: "%.1f", selectedDateTotal)) oz")
+                            .font(.system(size: 14))
+                            .foregroundColor(.blue)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
+                        if tomorrow <= Date() {
+                            selectedDate = tomorrow
+                        }
+                    }) {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.blue)
+                            .frame(width: 44, height: 44)
+                    }
                 }
-            }
-            .padding()
-            .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
+                .padding(.horizontal)
+                .padding(.vertical, 16)
+                .padding(.top, 8)
             
             // Logs list
             if selectedDateEntries.isEmpty {
@@ -102,8 +108,6 @@ struct LogsView: View {
                 .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
             }
         }
-        .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
-        .ignoresSafeArea()
     }
 }
 
