@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var viewModel: WaterTrackingViewModel
     @State private var showSettings = false
+    @State private var showLogs = false
     
     var body: some View {
         ZStack {
@@ -50,12 +51,14 @@ struct ContentView: View {
                             }
                             .alignmentGuide(.circleCenter) { d in d[VerticalAlignment.center] }
                             
-                            // Circular progress indicator
-                            CircularWaterProgress(
-                                currentAmount: viewModel.getTdayTotal(),
-                                dailyGoal: viewModel.dailyGoal
-                            )
-                            .frame(maxWidth: 200)
+                            // Circular progress indicator - tap to view logs
+                            Button(action: { showLogs = true }) {
+                                CircularWaterProgress(
+                                    currentAmount: viewModel.getTdayTotal(),
+                                    dailyGoal: viewModel.dailyGoal
+                                )
+                                .frame(maxWidth: 200)
+                            }
                             .alignmentGuide(.circleCenter) { d in d[VerticalAlignment.center] + 50 }
                             
                             // Plus button
@@ -99,43 +102,6 @@ struct ContentView: View {
                         }
                         .padding(.horizontal)
                         
-                        // Today's entries
-                        if !viewModel.getTodayEntries().isEmpty {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Today's Log")
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .padding(.horizontal)
-                                
-                                VStack(spacing: 8) {
-                                    ForEach(viewModel.getTodayEntries()) { entry in
-                                        HStack {
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text("\(String(format: "%.1f", entry.amount)) oz")
-                                                    .font(.system(size: 14, weight: .semibold))
-                                                Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                            }
-                                            
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                viewModel.removeEntry(entry)
-                                            }) {
-                                                Image(systemName: "xmark.circle.fill")
-                                                    .foregroundColor(.red)
-                                                    .font(.system(size: 16))
-                                            }
-                                        }
-                                        .padding()
-                                        .background(Color.white)
-                                        .cornerRadius(8)
-                                    }
-                                }
-                                .padding(.horizontal)
-                            }
-                        }
-                        
                         Spacer(minLength: 20)
                     }
                     .frame(maxWidth: .infinity)
@@ -147,6 +113,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()
+        }
+        .sheet(isPresented: $showLogs) {
+            LogsView()
         }
     }
 }
