@@ -37,35 +37,39 @@ struct ContentView: View {
                 ScrollView {
                     VStack(spacing: 30) {
                         // Circular progress with +/- buttons
-                        HStack(alignment: .center, spacing: 30) {
-                            // Minus button
-                            Button(action: {
-                                if viewModel.getTdayTotal() > 0 {
-                                    viewModel.removeLastEntry()
-                                }
-                            }) {
-                                Image(systemName: "minus")
-                                    .font(.system(size: 28, weight: .semibold))
-                                    .foregroundColor(.blue)
-                            }
-                            
-                            // Circular progress indicator
+                        ZStack {
                             CircularWaterProgress(
                                 currentAmount: viewModel.getTdayTotal(),
                                 dailyGoal: viewModel.dailyGoal
                             )
                             .frame(maxWidth: 200)
                             
-                            // Plus button
-                            Button(action: {
-                                if !viewModel.presets.isEmpty {
-                                    viewModel.addWaterEntry(amount: viewModel.presets[0])
+                            HStack(spacing: 30) {
+                                // Minus button
+                                Button(action: {
+                                    if viewModel.getTdayTotal() > 0 {
+                                        viewModel.removeLastEntry()
+                                    }
+                                }) {
+                                    Image(systemName: "minus")
+                                        .font(.system(size: 28, weight: .semibold))
+                                        .foregroundColor(.blue)
                                 }
-                            }) {
-                                Image(systemName: "plus")
-                                    .font(.system(size: 28, weight: .semibold))
-                                    .foregroundColor(.blue)
+                                
+                                Spacer()
+                                
+                                // Plus button
+                                Button(action: {
+                                    if !viewModel.presets.isEmpty {
+                                        viewModel.addWaterEntry(amount: viewModel.presets[0])
+                                    }
+                                }) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 28, weight: .semibold))
+                                        .foregroundColor(.blue)
+                                }
                             }
+                            .frame(maxWidth: 160)
                         }
                         .padding()
                         
