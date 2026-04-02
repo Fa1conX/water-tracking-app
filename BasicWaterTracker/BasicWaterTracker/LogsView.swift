@@ -63,53 +63,54 @@ struct LogsView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 16)
                 .padding(.top, 8)
-            
-            // Logs list
-            if selectedDateEntries.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("No entries for this day")
-                        .font(.system(size: 16))
-                        .foregroundColor(.gray)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
-            } else {
-                ScrollView {
-                    VStack(spacing: 8) {
-                        ForEach(selectedDateEntries) { entry in
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("\(String(format: "%.1f", entry.amount)) oz")
-                                        .font(.system(size: 14, weight: .semibold))
-                                    Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-                                }
-                                
-                                Spacer()
-                                
-                                Button(action: {
-                                    viewModel.removeEntry(entry)
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.red)
-                                        .font(.system(size: 16))
-                                }
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                        }
+                
+                // Logs list
+                if selectedDateEntries.isEmpty {
+                    VStack {
+                        Spacer()
+                        Text("No entries for this day")
+                            .font(.system(size: 16))
+                            .foregroundColor(.gray)
+                        Spacer()
                     }
-                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
+                } else {
+                    ScrollView {
+                        VStack(spacing: 8) {
+                            ForEach(selectedDateEntries) { entry in
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("\(String(format: "%.1f", entry.amount)) oz")
+                                            .font(.system(size: 14, weight: .semibold))
+                                        Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Button(action: {
+                                        viewModel.removeEntry(entry)
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.red)
+                                            .font(.system(size: 16))
+                                    }
+                                }
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(8)
+                            }
+                        }
+                        .padding()
+                    }
+                    .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
                 }
-                .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
+                
+                Spacer()
             }
         }
-    }
-}
 
 #Preview {
     LogsView()
