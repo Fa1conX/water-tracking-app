@@ -39,12 +39,12 @@ struct CircularWaterProgress: View {
                 
                 // Progress circle (filled from bottom all the way around)
                 Circle()
-                    .trim(from: 0.75, to: 0.75 + progress)
+                    .trim(from: 0, to: progress)
                     .stroke(
                         Color(red: 0.3, green: 0.7, blue: 1.0),
                         style: StrokeStyle(lineWidth: 12, lineCap: .round)
                     )
-                    .rotationEffect(.degrees(-90))
+                    .rotationEffect(.degrees(270))
                     .animation(.easeInOut(duration: 0.5), value: progress)
                 
                 // Center text
