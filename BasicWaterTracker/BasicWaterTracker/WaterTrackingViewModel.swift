@@ -11,11 +11,14 @@ import Combine
 class WaterTrackingViewModel: ObservableObject {
     @Published var entries: [WaterEntry] = []
     @Published var selectedDate: Date = Date()
+    @Published var presets: [Double] = [8, 16, 24]  // oz values
+    @Published var dailyGoal: Double = 64  // oz
     
     private let storageService = StorageService.shared
     
     init() {
         loadEntries()
+        loadPresets()
     }
     
     // MARK: - Public Methods
@@ -53,5 +56,14 @@ class WaterTrackingViewModel: ObservableObject {
     
     private func saveEntries() {
         storageService.saveEntries(entries)
+    }
+    
+    private func loadPresets() {
+        presets = storageService.loadPresets()
+    }
+    
+    func updatePresets(_ newPresets: [Double]) {
+        presets = newPresets
+        storageService.savePresets(newPresets)
     }
 }

@@ -28,4 +28,13 @@ class StorageService {
         }
         return []
     }
+    
+    func savePresets(_ presets: [Double]) {
+        UserDefaults.standard.set(presets, forKey: "waterPresets")
+    }
+    
+    func loadPresets() -> [Double] {
+        let defaults = UserDefaults.standard.array(forKey: "waterPresets") as? [Double]
+        return defaults ?? [8, 16, 24]  // Default presets in oz
+    }
 }

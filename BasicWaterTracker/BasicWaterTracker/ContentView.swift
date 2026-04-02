@@ -9,129 +9,109 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var viewModel: WaterTrackingViewModel
+    @State private var showSettings = false
     
     var body: some View {
         ZStack {
-            Color(.systemBackground)
+            // Mild grey background
+            Color(red: 0.96, green: 0.96, blue: 0.97)
                 .ignoresSafeArea()
             
-            NavigationView {
-                VStack(spacing: 20) {
-                    // Daily Total Section
-                    VStack(spacing: 10) {
-                        Text("Today's Water Intake")
-                            .font(.headline)
-                        
-                        HStack(spacing: 20) {
-                            VStack {
-                                Text(String(format: "%.0f", viewModel.getTdayTotal()))
-                                    .font(.system(size: 36, weight: .bold))
-                                    .foregroundColor(.blue)
-                                Text("ml")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                ProgressView(value: min(viewModel.getTdayTotal() / 2000, 1.0))
-                                Text("Goal: 2000 ml")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
+            VStack(spacing: 0) {
+                // Header with settings
+                HStack {
+                    Text("Water Tracker")
+                        .font(.system(size: 24, weight: .bold))
+                    
+                    Spacer()
+                    
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gear")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.blue)
+                            .frame(width: 44, height: 44)
+                    }
+                }
+                .padding()
+                
+                ScrollView {
+                    VStack(spacing: 30) {
+                        // Circular progress indicator
+                        CircularWaterProgress(
+                            currentAmount: viewModel.getTdayTotal(),
+                            dailyGoal: viewModel.dailyGoal
+                        )
                         .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                    }
-                    .padding(.horizontal)
-                    
-                    // Quick Add Buttons
-                    VStack(spacing: 10) {
-                        Text("Quick Add")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        HStack(spacing: 10) {
-                            QuickAddButton(amount: 250, label: "250ml")
-                            QuickAddButton(amount: 500, label: "500ml")
-                            QuickAddButton(amount: 750, label: "750ml")
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    // Today's Entries
-                    VStack(spacing: 10) {
-                        Text("Today's Entries")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        if viewModel.getTodayEntries().isEmpty {
-                            Text("No entries yet. Add your first water intake!")
-                                .foregroundColor(.gray)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding()
-                        } else {
-                            List {
-                                ForEach(viewModel.getTodayEntries()) { entry in
+                        // Quick add buttons
+                        VStack(spacing: 12) {
+                            ForEach(viewModel.presets, id: \.self) { preset in
+                                Button(action: {
+                                    viewModel.addWaterEntry(amount: preset)
+                                }) {
                                     HStack {
                                         Image(systemName: "drop.fill")
-                                            .foregroundColor(.blue)
+                                            .font(.system(size: 16))
                                         
-                                        VStack(alignment: .leading) {
-                                            Text("\(Int(entry.amount)) ml")
-                                                .font(.body)
-                                            Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
-                                                .font(.caption)
-                                                .foregroundColor(.gray)
-                                        }
+                                        Text("\(String(format: "%.0f", preset)) oz")
+                                            .font(.system(size: 16, weight: .semibold))
                                         
                                         Spacer()
                                     }
-                                    .swipeActions(edge: .trailing) {
-                                        Button(role: .destructive) {
-                                            viewModel.removeEntry(entry)
-                                        } label: {
-                                            Image(systemName: "trash")
-                                        }
-                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.blue)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
                                 }
                             }
-                            .listStyle(.plain)
                         }
+                        .padding(.horizontal)
+                        
+                        // Today's entries
+                        if !viewModel.getTodayEntries().isEmpty {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Today's Log")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .padding(.horizontal)
+                                
+                                VStack(spacing: 8) {
+                                    ForEach(viewModel.getTodayEntries()) { entry in
+                                        HStack {
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                Text("\(String(format: "%.1f", entry.amount)) oz")
+                                                    .font(.system(size: 14, weight: .semibold))
+                                                Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            Button(action: {
+                                                viewModel.removeEntry(entry)
+                                            }) {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .foregroundColor(.red)
+                                                    .font(.system(size: 16))
+                                            }
+                                        }
+                                        .padding()
+                                        .background(Color.white)
+                                        .cornerRadius(8)
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                        
+                        Spacer(minLength: 20)
                     }
-                    .padding(.horizontal)
-                    
-                    Spacer()
                 }
-                .navigationTitle("Water Tracker")
             }
         }
-    }
-}
-
-// MARK: - Quick Add Button Component
-struct QuickAddButton: View {
-    @EnvironmentObject var viewModel: WaterTrackingViewModel
-    
-    let amount: Double
-    let label: String
-    
-    var body: some View {
-        Button(action: {
-            viewModel.addWaterEntry(amount: amount)
-        }) {
-            VStack {
-                Image(systemName: "drop.fill")
-                    .font(.title3)
-                Text(label)
-                    .font(.caption)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(8)
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
         }
     }
 }

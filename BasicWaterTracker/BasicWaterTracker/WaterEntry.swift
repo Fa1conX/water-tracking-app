@@ -10,7 +10,7 @@ import Foundation
 struct WaterEntry: Identifiable, Codable {
     let id: UUID
     let date: Date
-    let amount: Double  // in milliliters
+    let amount: Double  // in ounces
     let timestamp: Date
     
     init(date: Date, amount: Double) {
