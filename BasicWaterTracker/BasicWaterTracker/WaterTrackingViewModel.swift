@@ -34,6 +34,14 @@ class WaterTrackingViewModel: ObservableObject {
         saveEntries()
     }
     
+    func removeLastEntry() {
+        let today = Calendar.current.startOfDay(for: Date())
+        if let lastIndex = entries.lastIndex(where: { Calendar.current.startOfDay(for: $0.date) == today }) {
+            entries.remove(at: lastIndex)
+            saveEntries()
+        }
+    }
+    
     func getTdayTotal() -> Double {
         let today = Calendar.current.startOfDay(for: Date())
         return entries

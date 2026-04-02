@@ -13,8 +13,8 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Mild grey background
-            Color(red: 0.96, green: 0.96, blue: 0.97)
+            // Light grey background
+            Color(red: 0.94, green: 0.94, blue: 0.96)
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -36,11 +36,37 @@ struct ContentView: View {
                 
                 ScrollView {
                     VStack(spacing: 30) {
-                        // Circular progress indicator
-                        CircularWaterProgress(
-                            currentAmount: viewModel.getTdayTotal(),
-                            dailyGoal: viewModel.dailyGoal
-                        )
+                        // Circular progress with +/- buttons
+                        HStack(spacing: 30) {
+                            // Minus button
+                            Button(action: {
+                                if viewModel.getTdayTotal() > 0 {
+                                    viewModel.removeLastEntry()
+                                }
+                            }) {
+                                Image(systemName: "minus")
+                                    .font(.system(size: 28, weight: .semibold))
+                                    .foregroundColor(.blue)
+                            }
+                            
+                            // Circular progress indicator
+                            CircularWaterProgress(
+                                currentAmount: viewModel.getTdayTotal(),
+                                dailyGoal: viewModel.dailyGoal
+                            )
+                            .frame(maxWidth: 200)
+                            
+                            // Plus button
+                            Button(action: {
+                                if !viewModel.presets.isEmpty {
+                                    viewModel.addWaterEntry(amount: viewModel.presets[0])
+                                }
+                            }) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 28, weight: .semibold))
+                                    .foregroundColor(.blue)
+                            }
+                        }
                         .padding()
                         
                         // Quick add buttons
