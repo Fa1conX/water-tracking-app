@@ -172,6 +172,7 @@ struct TwoWeekIntakeChart: View {
     let points: [DailyIntakePoint]
     let dailyGoal: Double
     private let chartHeight: CGFloat = 110
+    private let barSpacing: CGFloat = 6
 
     private var maxValue: Double {
         max(points.map(\.total).max() ?? 0, dailyGoal, 1)
@@ -193,22 +194,25 @@ struct TwoWeekIntakeChart: View {
                     .frame(height: 1)
                     .offset(y: goalLineOffset)
 
-                HStack(alignment: .bottom, spacing: 6) {
+                HStack(alignment: .bottom, spacing: barSpacing) {
                     ForEach(points) { point in
-                        VStack(spacing: 6) {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(point.total > dailyGoal ? Color.green : Color.blue)
-                                .frame(height: max(6, CGFloat(point.total / maxValue) * chartHeight))
-
-                            Text(point.date.formatted(.dateTime.weekday(.narrow)))
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(.secondary)
-                        }
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(point.total > dailyGoal ? Color.green : Color.blue)
+                            .frame(height: max(6, CGFloat(point.total / maxValue) * chartHeight))
                         .frame(maxWidth: .infinity)
                     }
                 }
             }
-            .frame(height: 130, alignment: .bottom)
+            .frame(height: chartHeight, alignment: .bottom)
+
+            HStack(alignment: .center, spacing: barSpacing) {
+                ForEach(points) { point in
+                    Text(point.date.formatted(.dateTime.weekday(.narrow)))
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity)
+                }
+            }
 
             HStack(spacing: 14) {
                 HStack(spacing: 6) {
