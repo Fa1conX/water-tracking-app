@@ -10,13 +10,18 @@ import SwiftUI
 struct CircularWaterProgress: View {
     let currentAmount: Double
     let dailyGoal: Double
+
+    var rawProgress: Double {
+        guard dailyGoal > 0 else { return 0 }
+        return currentAmount / dailyGoal
+    }
     
     var progress: Double {
-        min(currentAmount / dailyGoal, 1.0)
+        min(rawProgress, 1.0)
     }
     
     var percentage: Int {
-        Int(progress * 100)
+        Int((rawProgress * 100).rounded())
     }
     
     var body: some View {

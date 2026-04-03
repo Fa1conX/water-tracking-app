@@ -148,9 +148,15 @@ struct ScaleButtonStyle: ButtonStyle {
 struct TwoWeekIntakeChart: View {
     let points: [DailyIntakePoint]
     let dailyGoal: Double
+    private let chartHeight: CGFloat = 110
 
     private var maxValue: Double {
         max(points.map(\.total).max() ?? 0, dailyGoal, 1)
+    }
+
+    private var goalLineOffset: CGFloat {
+        let ratio = CGFloat(min(max(dailyGoal / maxValue, 0), 1))
+        return -(ratio * chartHeight)
     }
 
     var body: some View {
@@ -158,18 +164,25 @@ struct TwoWeekIntakeChart: View {
             Text("Last 14 Days")
                 .font(.system(size: 16, weight: .semibold))
 
-            HStack(alignment: .bottom, spacing: 6) {
-                ForEach(points) { point in
-                    VStack(spacing: 6) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(point.total > dailyGoal ? Color.green : Color.blue)
-                            .frame(height: max(6, CGFloat(point.total / maxValue) * 110))
+            ZStack(alignment: .bottom) {
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.35))
+                    .frame(height: 1)
+                    .offset(y: goalLineOffset)
 
-                        Text(point.date.formatted(.dateTime.weekday(.narrow)))
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(.secondary)
+                HStack(alignment: .bottom, spacing: 6) {
+                    ForEach(points) { point in
+                        VStack(spacing: 6) {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(point.total > dailyGoal ? Color.green : Color.blue)
+                                .frame(height: max(6, CGFloat(point.total / maxValue) * chartHeight))
+
+                            Text(point.date.formatted(.dateTime.weekday(.narrow)))
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
                 }
             }
             .frame(height: 130, alignment: .bottom)
