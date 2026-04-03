@@ -13,6 +13,7 @@ class WaterTrackingViewModel: ObservableObject {
     @Published var selectedDate: Date = Date()
     @Published var presets: [Double] = [8, 16, 24]  // oz values
     @Published var dailyGoal: Double = 64  // oz
+    @Published var isLoaded: Bool = false
     
     private let storageService = StorageService.shared
     
@@ -20,6 +21,9 @@ class WaterTrackingViewModel: ObservableObject {
         loadEntries()
         loadPresets()
         loadDailyGoal()
+        DispatchQueue.main.async {
+            self.isLoaded = true
+        }
     }
     
     // MARK: - Public Methods
