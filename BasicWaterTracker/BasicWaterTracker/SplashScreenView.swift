@@ -38,13 +38,13 @@ struct SplashScreenView: View {
         }
         .onAppear {
             // Scale and fade in animation
-            withAnimation(.easeOut(duration: 0.5)) {
+            withAnimation(.easeOut(duration: 0.8)) {
                 isAnimating = true
             }
             
             // Fade out animation after delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                withAnimation(.easeOut(duration: 0.5)) {
+                withAnimation(.easeOut(duration: 0.8)) {
                     opacity = 0.0
                 }
             }

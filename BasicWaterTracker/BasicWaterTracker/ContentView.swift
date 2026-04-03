@@ -12,6 +12,12 @@ struct ContentView: View {
     @State private var showSettings = false
     @State private var showLogs = false
     
+    var todayDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Calendar.current.startOfDay(for: Date()))
+    }
+    
     var body: some View {
         ZStack {
             // Light grey background
@@ -28,7 +34,7 @@ struct ContentView: View {
                     
                     Button(action: { showSettings = true }) {
                         Image(systemName: "gear")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(.blue)
                             .frame(width: 44, height: 44)
                     }
@@ -108,6 +114,7 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
+                    .id(todayDate)
                 }
                 .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
             }
@@ -125,7 +132,7 @@ struct ContentView: View {
 struct ScaleButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
 }

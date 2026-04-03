@@ -12,6 +12,7 @@ struct BasicWaterTrackerApp: App {
     @StateObject private var viewModel = WaterTrackingViewModel()
     @State private var showSplash = true
     @State private var minimumTimeElapsed = false
+    @State private var splashOpacity: Double = 1.0
     
     var body: some Scene {
         WindowGroup {
@@ -21,7 +22,7 @@ struct BasicWaterTrackerApp: App {
                 
                 if showSplash {
                     SplashScreenView()
-                        .transition(.opacity)
+                        .opacity(splashOpacity)
                         .onAppear {
                             // Set flag after minimum 1 second
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -39,7 +40,11 @@ struct BasicWaterTrackerApp: App {
     
     private func checkShouldDismiss() {
         if minimumTimeElapsed && viewModel.isLoaded {
-            withAnimation(.easeOut(duration: 0.5)) {
+            withAnimation(.easeOut(duration: 0.75)) {
+                splashOpacity = 0.0
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
                 showSplash = false
             }
         }
