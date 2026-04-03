@@ -26,8 +26,31 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 // Header with settings
                 HStack {
-                    Text("Water Tracker")
-                        .font(.system(size: 24, weight: .bold))
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("7-Day Avg")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Text("\(String(format: "%.1f", viewModel.getTrailing7DayAverageExcludingToday())) oz")
+                                .font(.system(size: 18, weight: .bold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(10)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Streak")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Text("\(viewModel.getGoalStreakExcludingToday()) days")
+                                .font(.system(size: 18, weight: .bold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(10)
+                    }
                     
                     Spacer()
                     

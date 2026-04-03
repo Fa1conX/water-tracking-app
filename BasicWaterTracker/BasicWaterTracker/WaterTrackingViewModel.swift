@@ -84,6 +84,41 @@ class WaterTrackingViewModel: ObservableObject {
             return DailyIntakePoint(date: date, total: total)
         }
     }
+
+    func getTrailing7DayAverageExcludingToday() -> Double {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        let totals = (1...7).compactMap { daysBack -> Double? in
+            guard let day = calendar.date(byAdding: .day, value: -daysBack, to: today) else {
+                return nil
+            }
+            return totalIntake(on: day)
+        }
+
+        guard !totals.isEmpty else { return 0 }
+        return totals.reduce(0, +) / Double(totals.count)
+    }
+
+    func getGoalStreakExcludingToday() -> Int {
+        guard dailyGoal > 0 else { return 0 }
+
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        var streak = 0
+        var daysBack = 1
+
+        while let day = calendar.date(byAdding: .day, value: -daysBack, to: today) {
+            if totalIntake(on: day) >= dailyGoal {
+                streak += 1
+                daysBack += 1
+            } else {
+                break
+            }
+        }
+
+        return streak
+    }
     
     // MARK: - Private Methods
     
@@ -97,6 +132,13 @@ class WaterTrackingViewModel: ObservableObject {
     
     private func loadPresets() {
         presets = storageService.loadPresets()
+    }
+
+    private func totalIntake(on date: Date) -> Double {
+        let calendar = Calendar.current
+        return entries
+            .filter { calendar.isDate($0.date, inSameDayAs: date) }
+            .reduce(0) { $0 + $1.amount }
     }
     
     func updatePresets(_ newPresets: [Double]) {
