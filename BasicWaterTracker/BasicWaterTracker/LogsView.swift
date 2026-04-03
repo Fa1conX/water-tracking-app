@@ -10,6 +10,7 @@ import SwiftUI
 struct LogsView: View {
     @EnvironmentObject var viewModel: WaterTrackingViewModel
     @State private var selectedDate: Date = Date()
+    @Environment(\.colorScheme) var colorScheme
     
     var selectedDateEntries: [WaterEntry] {
         let startOfDay = Calendar.current.startOfDay(for: selectedDate)
@@ -83,9 +84,10 @@ struct LogsView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text("\(String(format: "%.1f", entry.amount)) oz")
                                             .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(colorScheme == .dark ? .white : .black)
                                         Text(entry.timestamp.formatted(date: .omitted, time: .shortened))
                                             .font(.caption)
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(colorScheme == .dark ? .gray : .gray)
                                     }
                                     
                                     Spacer()
@@ -99,7 +101,7 @@ struct LogsView: View {
                                     }
                                 }
                                 .padding()
-                                .background(Color.white)
+                                .background(colorScheme == .dark ? Color(red: 0.2, green: 0.2, blue: 0.2) : Color.white)
                                 .cornerRadius(8)
                             }
                         }
@@ -111,6 +113,8 @@ struct LogsView: View {
                 Spacer()
             }
         }
+    }
+}
 
 #Preview {
     LogsView()
