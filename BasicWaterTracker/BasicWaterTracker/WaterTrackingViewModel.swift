@@ -8,6 +8,13 @@
 import Foundation
 import Combine
 
+struct DailyIntakePoint: Identifiable {
+    let date: Date
+    let total: Double
+
+    var id: Date { date }
+}
+
 class WaterTrackingViewModel: ObservableObject {
     @Published var entries: [WaterEntry] = []
     @Published var selectedDate: Date = Date()
@@ -59,6 +66,23 @@ class WaterTrackingViewModel: ObservableObject {
         return entries
             .filter { Calendar.current.startOfDay(for: $0.date) == today }
             .sorted { $0.timestamp > $1.timestamp }
+    }
+
+    func getLast14DaysIntake() -> [DailyIntakePoint] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        return (0..<14).compactMap { offset in
+            guard let date = calendar.date(byAdding: .day, value: -(13 - offset), to: today) else {
+                return nil
+            }
+
+            let total = entries
+                .filter { calendar.isDate($0.date, inSameDayAs: date) }
+                .reduce(0) { $0 + $1.amount }
+
+            return DailyIntakePoint(date: date, total: total)
+        }
     }
     
     // MARK: - Private Methods

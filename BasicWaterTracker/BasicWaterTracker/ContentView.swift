@@ -108,6 +108,15 @@ struct ContentView: View {
                             }
                         }
                         .padding(.horizontal)
+
+                        Button(action: { showLogs = true }) {
+                            TwoWeekIntakeChart(
+                                points: viewModel.getLast14DaysIntake(),
+                                dailyGoal: viewModel.dailyGoal
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal)
                         
                         Spacer(minLength: 20)
                     }
@@ -133,6 +142,55 @@ struct ScaleButtonStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
+struct TwoWeekIntakeChart: View {
+    let points: [DailyIntakePoint]
+    let dailyGoal: Double
+
+    private var maxValue: Double {
+        max(points.map(\.total).max() ?? 0, dailyGoal, 1)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Last 14 Days")
+                .font(.system(size: 16, weight: .semibold))
+
+            HStack(alignment: .bottom, spacing: 6) {
+                ForEach(points) { point in
+                    VStack(spacing: 6) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(point.total > dailyGoal ? Color.green : Color.blue)
+                            .frame(height: max(6, CGFloat(point.total / maxValue) * 110))
+
+                        Text(point.date.formatted(.dateTime.weekday(.narrow)))
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .frame(height: 130, alignment: .bottom)
+
+            HStack(spacing: 14) {
+                HStack(spacing: 6) {
+                    Circle().fill(Color.green).frame(width: 8, height: 8)
+                    Text("Over goal")
+                }
+
+                HStack(spacing: 6) {
+                    Circle().fill(Color.blue).frame(width: 8, height: 8)
+                    Text("Below goal")
+                }
+            }
+            .font(.system(size: 11, weight: .medium))
+            .foregroundColor(.secondary)
+        }
+        .padding(14)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
     }
 }
 
