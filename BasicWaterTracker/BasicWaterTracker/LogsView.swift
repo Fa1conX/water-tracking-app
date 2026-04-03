@@ -25,8 +25,7 @@ struct LogsView: View {
     
     var body: some View {
         ZStack {
-            // Background
-            Color(red: 0.1608, green: 0.1647, blue: 0.1686)
+            Color.appBackground
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -75,7 +74,7 @@ struct LogsView: View {
                         Spacer()
                     }
                     .frame(maxWidth: .infinity)
-                    .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
+                    .background(Color.appBackground)
                 } else {
                     ScrollView {
                         VStack(spacing: 8) {
@@ -107,7 +106,7 @@ struct LogsView: View {
                         }
                         .padding()
                     }
-                    .background(Color(red: 0.1608, green: 0.1647, blue: 0.1686))
+                    .background(Color.appBackground)
                 }
                 
                 Spacer()
