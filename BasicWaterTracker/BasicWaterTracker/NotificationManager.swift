@@ -19,6 +19,8 @@ enum NotificationMode {
 class NotificationManager: ObservableObject {
     static let shared = NotificationManager()
     
+    private let urgentNoLogIdentifier = "water_urgent_no_log"
+    
     @Published var notificationsEnabled = false
     @Published var notificationMode: NotificationMode = .disabled
     @Published var intervalHours: Double = 2.0
@@ -69,10 +71,52 @@ class NotificationManager: ObservableObject {
         let intervalIdentifiers = (0..<5).map { "water_reminder_\($0)" }
         let specificIdentifiers = (0..<10).map { "water_reminder_specific_\($0)" }
         UNUserNotificationCenter.current().removePendingNotificationRequests(
-            withIdentifiers: intervalIdentifiers + specificIdentifiers
+            withIdentifiers: intervalIdentifiers + specificIdentifiers + [urgentNoLogIdentifier]
         )
         self.notificationsEnabled = false
         self.notificationMode = .disabled
+    }
+    
+    func scheduleUrgentNoLogReminder(cutoffTime: Date, hasLoggedToday: Bool) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: [urgentNoLogIdentifier]
+        )
+        
+        let now = Date()
+        let calendar = Calendar.current
+        let cutoffComponents = calendar.dateComponents([.hour, .minute], from: cutoffTime)
+
+        guard let hour = cutoffComponents.hour,
+              let minute = cutoffComponents.minute else {
+            return
+        }
+
+        let today = calendar.startOfDay(for: now)
+        guard let todayCutoff = calendar.date(
+            bySettingHour: hour,
+            minute: minute,
+            second: 0,
+            of: today
+        ) else {
+            return
+        }
+
+        let scheduledDate: Date
+        if hasLoggedToday {
+            scheduledDate = calendar.date(byAdding: .day, value: 1, to: todayCutoff) ?? todayCutoff
+        } else if now < todayCutoff {
+            scheduledDate = todayCutoff
+        } else {
+            scheduledDate = now.addingTimeInterval(60)
+        }
+
+        scheduleUrgentRequest(at: scheduledDate)
+    }
+
+    func disableUrgentNoLogReminder() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: [urgentNoLogIdentifier]
+        )
     }
     
     // MARK: - Private Methods
@@ -154,6 +198,31 @@ class NotificationManager: ObservableObject {
                 if let error = error {
                     print("Error scheduling specific time reminder: \(error.localizedDescription)")
                 }
+            }
+        }
+    }
+
+    private func scheduleUrgentRequest(at date: Date) {
+        let content = UNMutableNotificationContent()
+        content.title = "Hydration Alert"
+        content.body = "You have not logged any water today. Add your intake now."
+        content.sound = .default
+        content.badge = NSNumber(value: 1)
+
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: max(1, date.timeIntervalSinceNow),
+            repeats: false
+        )
+
+        let request = UNNotificationRequest(
+            identifier: urgentNoLogIdentifier,
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling urgent reminder: \(error.localizedDescription)")
             }
         }
     }

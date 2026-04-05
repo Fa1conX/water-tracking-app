@@ -97,4 +97,28 @@ class StorageService {
         }
         return []
     }
+
+    func saveUrgentNoLogReminderEnabled(_ enabled: Bool) {
+        UserDefaults.standard.set(enabled, forKey: "urgentNoLogReminderEnabled")
+    }
+
+    func loadUrgentNoLogReminderEnabled() -> Bool {
+        if UserDefaults.standard.object(forKey: "urgentNoLogReminderEnabled") == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: "urgentNoLogReminderEnabled")
+    }
+
+    func saveUrgentNoLogReminderTime(_ time: Date) {
+        UserDefaults.standard.set(time.timeIntervalSince1970, forKey: "urgentNoLogReminderTime")
+    }
+
+    func loadUrgentNoLogReminderTime() -> Date {
+        let saved = UserDefaults.standard.double(forKey: "urgentNoLogReminderTime")
+        if saved > 0 {
+            return Date(timeIntervalSince1970: saved)
+        }
+
+        return Calendar.current.date(from: DateComponents(hour: 19, minute: 0)) ?? Date()
+    }
 }

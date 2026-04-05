@@ -27,6 +27,8 @@ class WaterTrackingViewModel: ObservableObject {
     @Published var notificationMode: String = "disabled"  // "disabled", "interval", or "specific"
     @Published var intervalHours: Double = 2.0
     @Published var specificTimes: [Date] = []
+    @Published var urgentNoLogReminderEnabled: Bool = true
+    @Published var urgentNoLogReminderTime: Date = Calendar.current.date(from: DateComponents(hour: 19, minute: 0)) ?? Date()
     
     private let storageService = StorageService.shared
     private let notificationManager = NotificationManager.shared
@@ -47,11 +49,13 @@ class WaterTrackingViewModel: ObservableObject {
         let entry = WaterEntry(date: Date(), amount: amount)
         entries.append(entry)
         saveEntries()
+        syncUrgentNoLogReminder()
     }
     
     func removeEntry(_ entry: WaterEntry) {
         entries.removeAll { $0.id == entry.id }
         saveEntries()
+        syncUrgentNoLogReminder()
     }
     
     func removeLastEntry() {
@@ -59,6 +63,7 @@ class WaterTrackingViewModel: ObservableObject {
         if let lastIndex = entries.lastIndex(where: { Calendar.current.startOfDay(for: $0.date) == today }) {
             entries.remove(at: lastIndex)
             saveEntries()
+            syncUrgentNoLogReminder()
         }
     }
     
@@ -170,6 +175,9 @@ class WaterTrackingViewModel: ObservableObject {
         notificationMode = storageService.loadNotificationMode()
         intervalHours = storageService.loadIntervalHours()
         specificTimes = storageService.loadSpecificTimes()
+        urgentNoLogReminderEnabled = storageService.loadUrgentNoLogReminderEnabled()
+        urgentNoLogReminderTime = storageService.loadUrgentNoLogReminderTime()
+        syncUrgentNoLogReminder()
     }
     
     func enableIntervalReminders(hours: Double) {
@@ -182,6 +190,7 @@ class WaterTrackingViewModel: ObservableObject {
         storageService.saveIntervalHours(hours)
         
         notificationManager.scheduleReminders(mode: .interval(hours: hours))
+        syncUrgentNoLogReminder()
     }
     
     func enableSpecificTimeReminders(times: [Date]) {
@@ -194,6 +203,7 @@ class WaterTrackingViewModel: ObservableObject {
         storageService.saveSpecificTimes(times)
         
         notificationManager.scheduleReminders(mode: .specific(times: times))
+        syncUrgentNoLogReminder()
     }
     
     func disableReminders() {
@@ -204,5 +214,29 @@ class WaterTrackingViewModel: ObservableObject {
         storageService.saveNotificationMode("disabled")
         
         notificationManager.disableReminders()
+        syncUrgentNoLogReminder()
+    }
+
+    func updateUrgentNoLogReminder(enabled: Bool, cutoffTime: Date) {
+        urgentNoLogReminderEnabled = enabled
+        urgentNoLogReminderTime = cutoffTime
+
+        storageService.saveUrgentNoLogReminderEnabled(enabled)
+        storageService.saveUrgentNoLogReminderTime(cutoffTime)
+
+        syncUrgentNoLogReminder()
+    }
+
+    private func syncUrgentNoLogReminder() {
+        guard notificationsEnabled && urgentNoLogReminderEnabled else {
+            notificationManager.disableUrgentNoLogReminder()
+            return
+        }
+
+        let hasLoggedToday = getTdayTotal() > 0
+        notificationManager.scheduleUrgentNoLogReminder(
+            cutoffTime: urgentNoLogReminderTime,
+            hasLoggedToday: hasLoggedToday
+        )
     }
 }

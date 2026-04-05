@@ -22,6 +22,8 @@ struct SettingsView: View {
     @State private var notificationMode: String = "disabled"  // "interval" or "specific"
     @State private var intervalHours: Double = 2.0
     @State private var specificTimes: [Date] = []
+    @State private var urgentNoLogReminderEnabled: Bool = true
+    @State private var urgentNoLogReminderTime: Date = Calendar.current.date(from: DateComponents(hour: 19, minute: 0)) ?? Date()
     
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -119,6 +121,18 @@ struct SettingsView: View {
                             }
                         }
                     }
+
+                    Section(header: Text("Urgent No-Log Alert")) {
+                        Toggle("Alert if no logs by time", isOn: $urgentNoLogReminderEnabled)
+
+                        if urgentNoLogReminderEnabled {
+                            DatePicker(
+                                "Alert Time",
+                                selection: $urgentNoLogReminderTime,
+                                displayedComponents: .hourAndMinute
+                            )
+                        }
+                    }
                 }
             }
             .navigationTitle("Settings")
@@ -171,6 +185,8 @@ struct SettingsView: View {
         notificationsEnabled = viewModel.notificationsEnabled
         notificationMode = viewModel.notificationMode
         intervalHours = viewModel.intervalHours
+        urgentNoLogReminderEnabled = viewModel.urgentNoLogReminderEnabled
+        urgentNoLogReminderTime = viewModel.urgentNoLogReminderTime
         specificTimes = viewModel.specificTimes.isEmpty ? [
             Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date(),
             Calendar.current.date(from: DateComponents(hour: 12, minute: 0)) ?? Date(),
@@ -227,6 +243,11 @@ struct SettingsView: View {
         } else {
             viewModel.disableReminders()
         }
+
+        viewModel.updateUrgentNoLogReminder(
+            enabled: urgentNoLogReminderEnabled,
+            cutoffTime: urgentNoLogReminderTime
+        )
     }
 }
 
