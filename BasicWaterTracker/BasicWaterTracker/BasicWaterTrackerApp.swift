@@ -7,8 +7,20 @@
 
 import SwiftUI
 import UIKit
+import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        // Request notification permissions
+        NotificationManager.shared.requestNotificationPermission { granted in
+            print("Notification permission granted: \(granted)")
+        }
+        return true
+    }
+    
     func application(
         _ application: UIApplication,
         supportedInterfaceOrientationsFor window: UIWindow?
@@ -41,7 +53,7 @@ struct BasicWaterTrackerApp: App {
                                 checkShouldDismiss()
                             }
                         }
-                        .onChange(of: viewModel.isLoaded) { _ in
+                        .onChange(of: viewModel.isLoaded) {
                             checkShouldDismiss()
                         }
                 }

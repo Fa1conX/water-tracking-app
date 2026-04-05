@@ -22,12 +22,20 @@ class WaterTrackingViewModel: ObservableObject {
     @Published var dailyGoal: Double = 64  // oz
     @Published var isLoaded: Bool = false
     
+    // Notification settings
+    @Published var notificationsEnabled: Bool = false
+    @Published var notificationMode: String = "disabled"  // "disabled", "interval", or "specific"
+    @Published var intervalHours: Double = 2.0
+    @Published var specificTimes: [Date] = []
+    
     private let storageService = StorageService.shared
+    private let notificationManager = NotificationManager.shared
     
     init() {
         loadEntries()
         loadPresets()
         loadDailyGoal()
+        loadNotificationSettings()
         DispatchQueue.main.async {
             self.isLoaded = true
         }
@@ -153,5 +161,48 @@ class WaterTrackingViewModel: ObservableObject {
     
     private func loadDailyGoal() {
         dailyGoal = storageService.loadDailyGoal()
+    }
+    
+    // MARK: - Notification Methods
+    
+    private func loadNotificationSettings() {
+        notificationsEnabled = storageService.loadNotificationsEnabled()
+        notificationMode = storageService.loadNotificationMode()
+        intervalHours = storageService.loadIntervalHours()
+        specificTimes = storageService.loadSpecificTimes()
+    }
+    
+    func enableIntervalReminders(hours: Double) {
+        intervalHours = hours
+        notificationMode = "interval"
+        notificationsEnabled = true
+        
+        storageService.saveNotificationsEnabled(true)
+        storageService.saveNotificationMode("interval")
+        storageService.saveIntervalHours(hours)
+        
+        notificationManager.scheduleReminders(mode: .interval(hours: hours))
+    }
+    
+    func enableSpecificTimeReminders(times: [Date]) {
+        specificTimes = times
+        notificationMode = "specific"
+        notificationsEnabled = true
+        
+        storageService.saveNotificationsEnabled(true)
+        storageService.saveNotificationMode("specific")
+        storageService.saveSpecificTimes(times)
+        
+        notificationManager.scheduleReminders(mode: .specific(times: times))
+    }
+    
+    func disableReminders() {
+        notificationsEnabled = false
+        notificationMode = "disabled"
+        
+        storageService.saveNotificationsEnabled(false)
+        storageService.saveNotificationMode("disabled")
+        
+        notificationManager.disableReminders()
     }
 }
