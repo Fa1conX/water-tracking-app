@@ -197,7 +197,7 @@ struct TwoWeekIntakeChart: View {
                 HStack(alignment: .bottom, spacing: barSpacing) {
                     ForEach(points) { point in
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(point.total > dailyGoal ? Color.green : Color.blue)
+                            .fill(point.total >= dailyGoal ? Color.green : Color.blue)
                             .frame(height: max(6, CGFloat(point.total / maxValue) * chartHeight))
                         .frame(maxWidth: .infinity)
                     }
