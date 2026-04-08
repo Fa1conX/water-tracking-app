@@ -46,7 +46,7 @@ struct CircularWaterProgress: View {
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
-                        Color(red: 0.3, green: 0.7, blue: 1.0),
+                        rawProgress >= 1.0 ? Color.green : Color(red: 0.3, green: 0.7, blue: 1.0),
                         style: StrokeStyle(lineWidth: 12, lineCap: .round)
                     )
                     .rotationEffect(.degrees(270))
