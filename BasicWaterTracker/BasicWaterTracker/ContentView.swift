@@ -17,10 +17,15 @@ struct ContentView: View {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: Calendar.current.startOfDay(for: Date()))
     }
+
+    var todayTotal: Double {
+        viewModel.getTdayTotal()
+    }
     
     var body: some View {
         ZStack {
             AppBackgroundView()
+
             
             VStack(spacing: 0) {
                 // Header with settings
@@ -70,7 +75,7 @@ struct ContentView: View {
                         HStack(alignment: .circleCenter, spacing: 30) {
                             // Minus button
                             Button(action: {
-                                if viewModel.getTdayTotal() > 0 {
+                                if todayTotal > 0 {
                                     viewModel.removeLastEntry()
                                 }
                             }) {
@@ -83,7 +88,7 @@ struct ContentView: View {
                             // Circular progress indicator - tap to view logs
                             Button(action: { showLogs = true }) {
                                 CircularWaterProgress(
-                                    currentAmount: viewModel.getTdayTotal(),
+                                    currentAmount: todayTotal,
                                     dailyGoal: viewModel.dailyGoal
                                 )
                                 .frame(maxWidth: 200)
@@ -155,7 +160,11 @@ struct ContentView: View {
             LogsView()
         }
     }
+
+
 }
+
+
 
 struct ScaleButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
@@ -274,12 +283,12 @@ struct TwoWeekIntakeChart: View {
     private func showPopup(for id: Date) {
         hidePopupWorkItem?.cancel()
 
-        withAnimation(.easeInOut(duration: 0.25)) {
+        withAnimation(.easeInOut(duration: 0.2)) {
             selectedPointID = id
         }
 
         let workItem = DispatchWorkItem {
-            withAnimation(.easeInOut(duration: 0.25)) {
+            withAnimation(.easeInOut(duration: 0.2)) {
                 selectedPointID = nil
             }
         }
