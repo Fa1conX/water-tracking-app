@@ -131,13 +131,11 @@ struct ContentView: View {
                         }
                         .padding(.horizontal)
 
-                        Button(action: { showLogs = true }) {
-                            TwoWeekIntakeChart(
-                                points: viewModel.getLast14DaysIntake(),
-                                dailyGoal: viewModel.dailyGoal
-                            )
-                        }
-                        .buttonStyle(.plain)
+                        TwoWeekIntakeChart(
+                            points: viewModel.getLast14DaysIntake(),
+                            dailyGoal: viewModel.dailyGoal,
+                            onTitleTap: { showLogs = true }
+                        )
                         .padding(.horizontal)
                         
                         Spacer(minLength: 20)
@@ -170,6 +168,8 @@ struct ScaleButtonStyle: ButtonStyle {
 struct TwoWeekIntakeChart: View {
     let points: [DailyIntakePoint]
     let dailyGoal: Double
+    let onTitleTap: () -> Void
+    @State private var selectedPointID: Date?
     private let chartHeight: CGFloat = 110
     private let barSpacing: CGFloat = 6
 
@@ -184,8 +184,16 @@ struct TwoWeekIntakeChart: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Last 14 Days")
-                .font(.system(size: 16, weight: .semibold))
+            Button(action: onTitleTap) {
+                HStack(spacing: 6) {
+                    Text("Last 14 Days")
+                        .font(.system(size: 16, weight: .semibold))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+                .foregroundColor(.primary)
+            }
+            .buttonStyle(.plain)
 
             ZStack(alignment: .bottom) {
                 Rectangle()
@@ -194,11 +202,27 @@ struct TwoWeekIntakeChart: View {
                     .offset(y: goalLineOffset)
 
                 HStack(alignment: .bottom, spacing: barSpacing) {
-                    ForEach(points) { point in
+                    ForEach(Array(points.enumerated()), id: \.element.id) { index, point in
                         RoundedRectangle(cornerRadius: 4)
                             .fill(point.total >= dailyGoal ? Color.green : Color.blue)
                             .frame(height: max(6, CGFloat(point.total / maxValue) * chartHeight))
+                            .overlay(alignment: .top) {
+                                if selectedPointID == point.id {
+                                    BarValuePopup(
+                                        text: "\(Int(point.total.rounded())) oz",
+                                        arrowOffset: -popupXOffset(for: index)
+                                    )
+                                    .offset(x: popupXOffset(for: index), y: -34)
+                                    .transition(.opacity)
+                                }
+                            }
                         .frame(maxWidth: .infinity)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                selectedPointID = selectedPointID == point.id ? nil : point.id
+                            }
+                        }
                     }
                 }
             }
@@ -230,6 +254,56 @@ struct TwoWeekIntakeChart: View {
         .padding(14)
         .background(Color(.secondarySystemBackground))
         .cornerRadius(12)
+    }
+
+    private func popupXOffset(for index: Int) -> CGFloat {
+        if index == 0 { return 24 }
+        if index == 1 { return 10 }
+        if index == points.count - 2 { return -10 }
+        if index == points.count - 1 { return -24 }
+        return 0
+    }
+}
+
+private struct BarValuePopup: View {
+    let text: String
+    let arrowOffset: CGFloat
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text(text)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.primary)
+                .frame(minWidth: 60)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 7)
+                .background(Color(.systemBackground).opacity(0.96))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9)
+                        .stroke(Color.secondary.opacity(0.35), lineWidth: 1)
+                )
+                .cornerRadius(9)
+
+            TrianglePointer()
+                .fill(Color(.systemBackground).opacity(0.96))
+                .frame(width: 12, height: 8)
+                .overlay(
+                    TrianglePointer()
+                        .stroke(Color.secondary.opacity(0.35), lineWidth: 1)
+                )
+                .offset(x: arrowOffset)
+        }
+    }
+}
+
+private struct TrianglePointer: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.closeSubpath()
+        return path
     }
 }
 
