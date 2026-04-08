@@ -170,6 +170,7 @@ struct TwoWeekIntakeChart: View {
     let dailyGoal: Double
     let onTitleTap: () -> Void
     @State private var selectedPointID: Date?
+    @State private var hidePopupWorkItem: DispatchWorkItem?
     private let chartHeight: CGFloat = 110
     private let barSpacing: CGFloat = 6
 
@@ -219,14 +220,20 @@ struct TwoWeekIntakeChart: View {
                         .frame(maxWidth: .infinity)
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                selectedPointID = selectedPointID == point.id ? nil : point.id
+                            if selectedPointID == point.id {
+                                hideSelectedPopup()
+                            } else {
+                                showPopup(for: point.id)
                             }
                         }
                     }
                 }
             }
             .frame(height: chartHeight, alignment: .bottom)
+            .onDisappear {
+                hidePopupWorkItem?.cancel()
+                hidePopupWorkItem = nil
+            }
 
             HStack(alignment: .center, spacing: barSpacing) {
                 ForEach(points) { point in
@@ -262,6 +269,32 @@ struct TwoWeekIntakeChart: View {
         if index == points.count - 2 { return -10 }
         if index == points.count - 1 { return -24 }
         return 0
+    }
+
+    private func showPopup(for id: Date) {
+        hidePopupWorkItem?.cancel()
+
+        withAnimation(.easeInOut(duration: 0.25)) {
+            selectedPointID = id
+        }
+
+        let workItem = DispatchWorkItem {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                selectedPointID = nil
+            }
+        }
+
+        hidePopupWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4, execute: workItem)
+    }
+
+    private func hideSelectedPopup() {
+        hidePopupWorkItem?.cancel()
+        hidePopupWorkItem = nil
+
+        withAnimation(.easeInOut(duration: 0.2)) {
+            selectedPointID = nil
+        }
     }
 }
 
