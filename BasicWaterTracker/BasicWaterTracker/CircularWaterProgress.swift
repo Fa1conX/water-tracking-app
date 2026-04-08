@@ -23,6 +23,29 @@ struct CircularWaterProgress: View {
     var percentage: Int {
         Int((rawProgress * 100).rounded())
     }
+
+    var ringColor: Color {
+        if rawProgress > 2.0 {
+            return .red
+        }
+
+        if rawProgress >= 1.0 {
+            return .green
+        }
+
+        switch rawProgress {
+        case ..<0.2:
+            return Color(red: 0.07, green: 0.24, blue: 0.50) // dark blue
+        case ..<0.4:
+            return Color(red: 0.11, green: 0.34, blue: 0.66)
+        case ..<0.6:
+            return Color(red: 0.17, green: 0.46, blue: 0.79)
+        case ..<0.8:
+            return Color(red: 0.24, green: 0.58, blue: 0.90)
+        default:
+            return Color(red: 0.40, green: 0.72, blue: 0.98) // light blue
+        }
+    }
     
     var body: some View {
         VStack(spacing: 20) {
@@ -46,11 +69,12 @@ struct CircularWaterProgress: View {
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
-                        rawProgress >= 1.0 ? Color.green : Color(red: 0.3, green: 0.7, blue: 1.0),
+                        ringColor,
                         style: StrokeStyle(lineWidth: 12, lineCap: .round)
                     )
                     .rotationEffect(.degrees(270))
                     .animation(.easeInOut(duration: 0.5), value: progress)
+                    .animation(.easeInOut(duration: 0.3), value: rawProgress)
                 
                 // Center text - amount centered, oz below
                 Text("\(String(format: "%.1f", currentAmount))")
