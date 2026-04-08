@@ -7,12 +7,33 @@
 
 import SwiftUI
 
-extension Color {
-    static var appBackground: Color {
-        Color(UIColor { traitCollection in
-            traitCollection.userInterfaceStyle == .dark
-                ? UIColor(red: 0.1608, green: 0.1647, blue: 0.1686, alpha: 1.0)
-                : UIColor(red: 230.0 / 255.0, green: 236.0 / 255.0, blue: 248.0 / 255.0, alpha: 1.0)
-        })
+struct AppBackgroundView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        Group {
+            if colorScheme == .dark {
+                LinearGradient(
+                    colors: [
+                        Color(red: 32.0 / 255.0, green: 45.0 / 255.0, blue: 40.0 / 255.0), // top left
+                        Color(red: 41.0 / 255.0, green: 42.0 / 255.0, blue: 48.0 / 255.0), // main color
+                        Color(red: 50.0 / 255.0, green: 40.0 / 255.0, blue: 36.0 / 255.0) //bottom right
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            } else {
+                LinearGradient(
+                    colors: [
+                        Color(red: 220.0 / 255.0, green: 238.0 / 255.0, blue: 246.0 / 255.0), // top left
+                        Color(red: 230.0 / 255.0, green: 236.0 / 255.0, blue: 249.0 / 255.0), // main color
+                        Color(red: 243.0 / 255.0, green: 234.0 / 255.0, blue: 246.0 / 255.0) //bottom right
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+        }
+        .ignoresSafeArea()
     }
 }

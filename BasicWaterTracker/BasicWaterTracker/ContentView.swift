@@ -20,8 +20,7 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            Color.appBackground
-                .ignoresSafeArea()
+            AppBackgroundView()
             
             VStack(spacing: 0) {
                 // Header with settings
@@ -144,12 +143,12 @@ struct ContentView: View {
                         Spacer(minLength: 20)
                     }
                     .frame(maxWidth: .infinity)
-                    .background(Color.appBackground)
+                    .background(AppBackgroundView())
                     .id(todayDate)
                 }
-                .background(Color.appBackground)
+                .background(AppBackgroundView())
             }
-            .background(Color.appBackground)
+            .background(AppBackgroundView())
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()

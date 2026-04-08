@@ -25,8 +25,7 @@ struct LogsView: View {
     
     var body: some View {
         ZStack {
-            Color.appBackground
-                .ignoresSafeArea()
+            AppBackgroundView()
             
             VStack(spacing: 0) {
                 // Header with date navigation
@@ -74,7 +73,7 @@ struct LogsView: View {
                         Spacer()
                     }
                     .frame(maxWidth: .infinity)
-                    .background(Color.appBackground)
+                    .background(AppBackgroundView())
                 } else {
                     ScrollView {
                         VStack(spacing: 8) {
@@ -106,7 +105,7 @@ struct LogsView: View {
                         }
                         .padding()
                     }
-                    .background(Color.appBackground)
+                    .background(AppBackgroundView())
                 }
                 
                 Spacer()
