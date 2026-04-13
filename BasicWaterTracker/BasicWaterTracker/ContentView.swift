@@ -92,6 +92,7 @@ struct ContentView: View {
                                     dailyGoal: viewModel.dailyGoal
                                 )
                                 .frame(maxWidth: 200)
+                                .id(todayDate)
                             }
                             .alignmentGuide(.circleCenter) { d in d[VerticalAlignment.center] + 50 }
                             
@@ -158,6 +159,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showLogs) {
             LogsView()
+        }
+        .onChange(of: todayDate) {
+            // Force refresh when date changes
         }
     }
 
