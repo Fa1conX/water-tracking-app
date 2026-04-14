@@ -32,6 +32,30 @@ struct ContentView: View {
                 HStack {
                     HStack(spacing: 10) {
                         VStack(alignment: .leading, spacing: 2) {
+                            Text("GPA")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Text("\(String(format: "%.2f", viewModel.getSevenDayGPA()))")
+                                .font(.system(size: 18, weight: .bold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(10)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Today")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                            Text(viewModel.getTodayGrade())
+                                .font(.system(size: 18, weight: .bold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(10)
+
+                        VStack(alignment: .leading, spacing: 2) {
                             Text("7-Day Avg")
                                 .font(.system(size: 11, weight: .medium))
                                 .foregroundColor(.secondary)

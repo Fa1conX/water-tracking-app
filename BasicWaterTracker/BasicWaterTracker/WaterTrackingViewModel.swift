@@ -133,6 +133,119 @@ class WaterTrackingViewModel: ObservableObject {
         return streak
     }
     
+    // MARK: - Grade & GPA Calculation
+    
+    func getTodayGrade() -> String {
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let todayEntries = entries.filter { calendar.startOfDay(for: $0.date) == today }
+        let currentHour = calendar.component(.hour, from: now)
+        
+        // Show "--" until either 1 entry is logged or 6 PM (18:00)
+        if todayEntries.isEmpty && currentHour < 18 {
+            return "--"
+        }
+        
+        let todayTotal = getTdayTotal()
+        let percentage = (todayTotal / dailyGoal) * 100
+        return percentageToGrade(percentage)
+    }
+    
+    func getSevenDayGPA() -> Double {
+        guard dailyGoal > 0 else { return 0 }
+        
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let currentHour = calendar.component(.hour, from: now)
+        
+        // Before 6 PM: last 7 complete days (days 1-7 back)
+        // After 6 PM: rolling 7 days including today (days 0-6 back)
+        let daysBackRange = currentHour >= 18 ? (0...6) : (1...7)
+        
+        var grades: [Double] = []
+        
+        for daysBack in daysBackRange {
+            guard let day = calendar.date(byAdding: .day, value: -daysBack, to: today) else {
+                continue
+            }
+            
+            let total = totalIntake(on: day)
+            let percentage = (total / dailyGoal) * 100
+            let grade = percentageToGrade(percentage)
+            let gpaValue = gradeToGPA(grade)
+            grades.append(gpaValue)
+        }
+        
+        guard !grades.isEmpty else { return 0 }
+        return grades.reduce(0, +) / Double(grades.count)
+    }
+    
+    private func percentageToGrade(_ percentage: Double) -> String {
+        let p = max(0, min(percentage, 999)) // Clamp to prevent out of range
+        
+        switch p {
+        case let p where p > 100:
+            return "A+"
+        case 93...100:
+            return "A"
+        case 90..<93:
+            return "A-"
+        case 87..<90:
+            return "B+"
+        case 83..<87:
+            return "B"
+        case 80..<83:
+            return "B-"
+        case 77..<80:
+            return "C+"
+        case 73..<77:
+            return "C"
+        case 70..<73:
+            return "C-"
+        case 67..<70:
+            return "D+"
+        case 63..<67:
+            return "D"
+        case 60..<63:
+            return "D-"
+        default:
+            return "F"
+        }
+    }
+    
+    private func gradeToGPA(_ grade: String) -> Double {
+        switch grade {
+        case "A+":
+            return 4.5
+        case "A":
+            return 4.0
+        case "A-":
+            return 3.7
+        case "B+":
+            return 3.3
+        case "B":
+            return 3.0
+        case "B-":
+            return 2.7
+        case "C+":
+            return 2.3
+        case "C":
+            return 2.0
+        case "C-":
+            return 1.7
+        case "D+":
+            return 1.3
+        case "D":
+            return 1.0
+        case "D-":
+            return 0.7
+        default: // F or "--"
+            return 0.0
+        }
+    }
+    
     // MARK: - Private Methods
     
     private func loadEntries() {
