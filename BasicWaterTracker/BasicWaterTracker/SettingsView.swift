@@ -25,6 +25,9 @@ struct SettingsView: View {
     @State private var urgentNoLogReminderEnabled: Bool = true
     @State private var urgentNoLogReminderTime: Date = Calendar.current.date(from: DateComponents(hour: 19, minute: 0)) ?? Date()
     
+    // Display settings
+    @State private var showGradeMetrics: Bool = true
+    
     @State private var showAlert = false
     @State private var alertMessage = ""
     
@@ -133,6 +136,10 @@ struct SettingsView: View {
                             )
                         }
                     }
+                    
+                    Section(header: Text("Display")) {
+                        Toggle("Show Grade Metrics", isOn: $showGradeMetrics)
+                    }
                 }
             }
             .navigationTitle("Settings")
@@ -193,6 +200,8 @@ struct SettingsView: View {
             Calendar.current.date(from: DateComponents(hour: 15, minute: 0)) ?? Date(),
             Calendar.current.date(from: DateComponents(hour: 18, minute: 0)) ?? Date(),
         ] : viewModel.specificTimes
+        
+        showGradeMetrics = viewModel.showGradeMetrics
     }
     
     private func addReminderTime() {
@@ -248,6 +257,8 @@ struct SettingsView: View {
             enabled: urgentNoLogReminderEnabled,
             cutoffTime: urgentNoLogReminderTime
         )
+        
+        viewModel.setShowGradeMetrics(showGradeMetrics)
     }
 }
 

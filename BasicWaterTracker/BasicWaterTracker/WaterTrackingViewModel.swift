@@ -30,6 +30,9 @@ class WaterTrackingViewModel: ObservableObject {
     @Published var urgentNoLogReminderEnabled: Bool = true
     @Published var urgentNoLogReminderTime: Date = Calendar.current.date(from: DateComponents(hour: 19, minute: 0)) ?? Date()
     
+    // Grade/GPA display setting
+    @Published var showGradeMetrics: Bool = true
+    
     private let storageService = StorageService.shared
     private let notificationManager = NotificationManager.shared
     
@@ -38,6 +41,7 @@ class WaterTrackingViewModel: ObservableObject {
         loadPresets()
         loadDailyGoal()
         loadNotificationSettings()
+        loadGradeMetricsSetting()
         DispatchQueue.main.async {
             self.isLoaded = true
         }
@@ -351,5 +355,14 @@ class WaterTrackingViewModel: ObservableObject {
             cutoffTime: urgentNoLogReminderTime,
             hasLoggedToday: hasLoggedToday
         )
+    }
+    
+    private func loadGradeMetricsSetting() {
+        showGradeMetrics = storageService.loadShowGradeMetrics()
+    }
+    
+    func setShowGradeMetrics(_ show: Bool) {
+        showGradeMetrics = show
+        storageService.saveShowGradeMetrics(show)
     }
 }

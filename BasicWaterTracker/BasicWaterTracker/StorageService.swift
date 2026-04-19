@@ -121,4 +121,18 @@ class StorageService {
 
         return Calendar.current.date(from: DateComponents(hour: 19, minute: 0)) ?? Date()
     }
+    
+    // MARK: - Grade Metrics Settings
+    
+    func saveShowGradeMetrics(_ show: Bool) {
+        UserDefaults.standard.set(show, forKey: "showGradeMetrics")
+    }
+    
+    func loadShowGradeMetrics() -> Bool {
+        let saved = UserDefaults.standard.object(forKey: "showGradeMetrics")
+        if let saved = saved as? Bool {
+            return saved
+        }
+        return true  // Default to showing grade metrics
+    }
 }
